@@ -1,0 +1,5 @@
+name: Config Owner
+description: Allows the enforcing of config ownership.
+
+type: module
+core: 8.x
