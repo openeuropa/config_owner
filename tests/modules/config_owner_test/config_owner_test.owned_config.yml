@@ -1,0 +1,6 @@
+config_owner_test:
+  install:
+    config_owner_test.settings:
+      keys:
+        - main_color
+    config_owner_test.test_config.*: ~

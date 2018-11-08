@@ -1,0 +1,4 @@
+services:
+  plugin.manager.owned_config:
+    class: Drupal\config_owner\OwnedConfigManager
+    arguments: ['@module_handler', '@cache.discovery']

@@ -1,0 +1,29 @@
+config_owner_test.settings:
+  type: config_object
+  label: 'Test config'
+  mapping:
+    main_color:
+      type: string
+      label: 'The main color'
+    allowed_colors:
+      type: sequence
+      label: 'Allowed colors'
+      sequence:
+        type: string
+        label: 'Color'
+
+config_owner_test.test_config.one:
+  type: config_object
+  label: 'Test config one'
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+
+config_owner_test.test_config.two:
+  type: config_object
+  label: 'Test config one'
+  mapping:
+    name:
+      type: string
+      label: 'Name'

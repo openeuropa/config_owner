@@ -1,0 +1,2 @@
+main_color: green
+allowed_colors: ['green', 'red']

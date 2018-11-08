@@ -1,4 +1,11 @@
-# OpenEuropa Drupal module template
+# Config Owner
+
+The Config Owner module provides the ability for modules to control the configuration they ship with. That means preventing sites that use it from
+exporting/importing changes to these configurations.
+
+## How to use
+
+The module works by exposing a YML based plugin type called Owned Config. Any module that wants to "own" some configuration, needs to create such a plugin. See the config_owner_test module as an example of using this plugin.
 
 ## Development setup
 

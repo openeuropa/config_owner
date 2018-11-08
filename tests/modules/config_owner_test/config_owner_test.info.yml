@@ -1,0 +1,4 @@
+name: Config Owner Test
+description: Test module for Config Owner
+core: 8.x
+type: module
