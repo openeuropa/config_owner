@@ -1,0 +1,6 @@
+services:
+  config_owner.commands:
+    class: \Drupal\config_owner\Commands\ConfigImportCommands
+    arguments: ['@config.manager', '@config.storage', '@plugin.manager.owned_config']
+    tags:
+      - { name: drush.command }
