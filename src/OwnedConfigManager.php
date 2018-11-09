@@ -5,6 +5,7 @@ namespace Drupal\config_owner;
 use Drupal\Component\Plugin\Exception\PluginException;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Config\InstallStorage;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
@@ -42,18 +43,6 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
   /**
    * {@inheritdoc}
    */
-  protected function getDiscovery() {
-    if (!isset($this->discovery)) {
-      $this->discovery = new YamlDiscovery('owned_config', $this->moduleHandler->getModuleDirectories());
-      $this->discovery->addTranslatableProperty('label', 'label_context');
-      $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
-    }
-    return $this->discovery;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function processDefinition(&$definition, $plugin_id) {
     parent::processDefinition($definition, $plugin_id);
 
@@ -67,18 +56,18 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
 
   /**
    * {@inheritdoc}
-   *
-   * @todo cache and invalidate
    */
   public function getOwnedConfigValues(): array {
+    $cache = $this->cacheBackend->get('owned_config_values');
+    if ($cache && $cache->data) {
+      return $cache->data;
+    }
+
     $configs = [];
     foreach ($this->getDefinitions() as $definition) {
       /** @var \Drupal\config_owner\OwnedConfig $plugin */
       $plugin = $this->createInstance($definition['id']);
-      $types = [
-        'install'
-        // @todo add the other two types: optional, owned
-      ];
+      $types = $this->getOwnedConfigTypes();
 
       foreach ($types as $type) {
         $type_configs = $plugin->getOwnedConfigValuesByType($type);
@@ -92,6 +81,43 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
       }
     }
 
+    $this->cacheBackend->set('owned_config_values', $configs);
+
     return $configs;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function configIsOwned($name): bool {
+    $config = $this->getOwnedConfigValues();
+    return isset($config[$name]);
+  }
+
+  /**
+   * Returns the types of the owned config:
+   *
+   * - Install folder
+   * - Optional folder
+   * - Owned folder
+   */
+  public static function getOwnedConfigTypes() {
+    return [
+      OwnedConfig::OWNED_CONFIG_INSTALL,
+      OwnedConfig::OWNED_CONFIG_OPTIONAL,
+      OwnedConfig::OWNED_CONFIG_OWNED,
+    ];
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function getDiscovery() {
+    if (!isset($this->discovery)) {
+      $this->discovery = new YamlDiscovery('owned_config', $this->moduleHandler->getModuleDirectories());
+      $this->discovery->addTranslatableProperty('label', 'label_context');
+      $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
+    }
+    return $this->discovery;
   }
 }

@@ -13,6 +13,18 @@ use Drupal\Core\Plugin\PluginBase;
 class OwnedConfig extends PluginBase {
 
   /**
+   * The three types of owned config.
+   */
+  const OWNED_CONFIG_INSTALL = 'install';
+  const OWNED_CONFIG_OPTIONAL = 'optional';
+  const OWNED_CONFIG_OWNED = 'owned';
+
+  /**
+   * The directory where owned config resides (config state).
+   */
+  const CONFIG_OWNED_DIRECTORY = 'config/owned';
+
+  /**
    * Returns the owned config values of a given type (directory);
    *
    * @param string $type
@@ -25,7 +37,7 @@ class OwnedConfig extends PluginBase {
       return [];
     }
 
-    $storage = $this->getStorage();
+    $storage = $this->getStorage($type);
     $prepared_definition = $this->prepareConfigDefinition($definition[$type], $storage);
     $configs = $this->getOwnedConfigValues($prepared_definition, $storage);
 
@@ -73,9 +85,16 @@ class OwnedConfig extends PluginBase {
    *
    * @return \Drupal\Core\Config\FileStorage
    */
-  protected function getStorage($location = InstallStorage::CONFIG_INSTALL_DIRECTORY) {
+  protected function getStorage($location = self::OWNED_CONFIG_INSTALL) {
+    $directory_map = [
+      self::OWNED_CONFIG_INSTALL => InstallStorage::CONFIG_INSTALL_DIRECTORY,
+      self::OWNED_CONFIG_OPTIONAL => InstallStorage::CONFIG_OPTIONAL_DIRECTORY,
+      self::OWNED_CONFIG_OWNED => self::CONFIG_OWNED_DIRECTORY,
+    ];
+
+    $directory = $directory_map[$location];
     $path = drupal_get_path('module', $this->getPluginDefinition()['provider']);
-    return new FileStorage($path . '/' . $location, StorageInterface::DEFAULT_COLLECTION);
+    return new FileStorage($path . '/' . $directory, StorageInterface::DEFAULT_COLLECTION);
   }
 
   /**

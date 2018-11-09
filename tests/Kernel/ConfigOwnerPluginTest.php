@@ -2,31 +2,10 @@
 
 namespace Drupal\Tests\config_owner\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-
 /**
  * Kernel test for the Config Owner.
  */
-class ConfigOwnerTest extends KernelTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static $modules = [
-    'system',
-    'config_filter',
-    'config_owner',
-    'config_owner_test',
-  ];
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function setUp() {
-    parent::setUp();
-    $this->installConfig(['system']);
-    $this->installConfig(['config_owner_test']);
-  }
+class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
 
   /**
    * Tests the config owner filter in the write operations.
@@ -42,24 +21,13 @@ class ConfigOwnerTest extends KernelTestBase {
     $this->copyConfig($active_storage, $sync_storage);
 
     // Make some changes in the active storage to some owned config.
-    $this->config('config_owner_test.settings')
-      ->set('main_color', 'yellow') // Owned key
-      ->set('allowed_colors', ['blue', 'orange']) // Not owned key
-      ->save();
-
-    $this->config('config_owner_test.test_config.one')
-      ->set('name', 'The new name')
-      // The entire config is owned.
-      ->save();
-
-    $this->config('system.site')
-      ->set('name', 'The new site name')
-      // The entire config is not owned.
-      ->save();
+    $this->performDefaultConfigChanges();
 
     // Because we changed the active storage, the diff will be shown in the
     // comparer.
-    $this->assertEquals(['system.site', 'config_owner_test.test_config.one', 'config_owner_test.settings'], $this->configImporter()->getStorageComparer()->getChangelist('update'));
+    $changes = $this->configImporter()->getStorageComparer()->getChangelist('update');
+    sort($changes);
+    $this->assertEquals(['config_owner_test.settings', 'config_owner_test.test_config.one', 'system.mail', 'system.site'], $changes);
 
     // Export again the configuration.
     $this->copyConfig($active_storage, $sync_storage);
@@ -75,6 +43,10 @@ class ConfigOwnerTest extends KernelTestBase {
     $config = $sync_storage->read('config_owner_test.test_config.one');
     // Owned so no change.
     $this->assertEquals('Test config one', $config['name']);
+
+    $config = $sync_storage->read('system.mail');
+    // Owned, so no change.
+    $this->assertEquals(['default' => 'php_mail'], $config['interface']);
 
     $config = $sync_storage->read('system.site');
     // Not owned, so change.

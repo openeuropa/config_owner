@@ -4,3 +4,5 @@ config_owner_test:
       keys:
         - main_color
     config_owner_test.test_config.*: ~
+  owned:
+    system.mail: ~

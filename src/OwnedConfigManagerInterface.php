@@ -15,4 +15,13 @@ interface OwnedConfigManagerInterface extends PluginManagerInterface {
    * @return array
    */
   public function getOwnedConfigValues(): array;
+
+  /**
+   * Determines whether a given configuration is owned by any module.
+   *
+   * @param $name
+   *
+   * @return bool
+   */
+  public function configIsOwned($name): bool;
 }
