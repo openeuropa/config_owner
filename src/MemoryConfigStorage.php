@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner;
 
 use Drupal\Core\Config\StorageInterface;
@@ -29,6 +31,7 @@ class MemoryConfigStorage implements StorageInterface {
    * MemoryConfigStorage constructor.
    *
    * @param string $collection
+   *   The config collection.
    */
   public function __construct($collection = StorageInterface::DEFAULT_COLLECTION) {
     $this->collection = $collection;

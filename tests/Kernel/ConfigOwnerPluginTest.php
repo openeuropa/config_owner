@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\config_owner\Kernel;
 
 /**
@@ -27,7 +29,12 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     // comparer.
     $changes = $this->configImporter()->getStorageComparer()->getChangelist('update');
     sort($changes);
-    $this->assertEquals(['config_owner_test.settings', 'config_owner_test.test_config.one', 'system.mail', 'system.site'], $changes);
+    $this->assertEquals([
+      'config_owner_test.settings',
+      'config_owner_test.test_config.one',
+      'system.mail',
+      'system.site',
+    ], $changes);
 
     // Export again the configuration.
     $this->copyConfig($active_storage, $sync_storage);
@@ -69,16 +76,20 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
 
     // Make changes to config in the sync (staging) storage.
     $config = $sync_storage->read('config_owner_test.settings');
-    $config['main_color'] = 'yellow'; // Owned
-    $config['allowed_colors'] = ['blue', 'orange']; // Not owned key
+    // Owned.
+    $config['main_color'] = 'yellow';
+    // Not owned key.
+    $config['allowed_colors'] = ['blue', 'orange'];
     $sync_storage->write('config_owner_test.settings', $config);
 
     $config = $sync_storage->read('config_owner_test.test_config.one');
-    $config['name'] = 'The new name'; // Owned
+    // Owned.
+    $config['name'] = 'The new name';
     $sync_storage->write('config_owner_test.test_config.one', $config);
 
     $config = $sync_storage->read('system.site');
-    $config['name'] = 'The new site name'; // Not owned
+    // Not owned.
+    $config['name'] = 'The new site name';
     $sync_storage->write('system.site', $config);
 
     $importer = $this->configImporter();

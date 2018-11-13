@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner\Plugin\ConfigFilter;
 
 use Drupal\config_filter\Plugin\ConfigFilterBase;
@@ -13,8 +15,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * We are filtering the sync storage in view of two things:
  *
- * - Prevent changes to the staging (file) storage to override owned config in the
- * active storage.
+ * - Prevent changes to the staging (file) storage to override owned config in
+ * the active storage.
  * - Prevent the export to the staging (file) storage of changes made to the
  * owned config.
  *
@@ -29,6 +31,8 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
   use DependencySerializationTrait;
 
   /**
+   * Owned config manager.
+   *
    * @var \Drupal\config_owner\OwnedConfigManagerInterface
    */
   protected $ownedConfigManager;
@@ -37,9 +41,13 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * ConfigOwner constructor.
    *
    * @param array $configuration
+   *   Plugin configuration.
    * @param string $plugin_id
+   *   Plugin ID.
    * @param array $plugin_definition
+   *   Plugin definition.
    * @param \Drupal\config_owner\OwnedConfigManagerInterface $ownedConfigManager
+   *   Owned config manager.
    */
   public function __construct(array $configuration, string $plugin_id, array $plugin_definition, OwnedConfigManagerInterface $ownedConfigManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -164,6 +172,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * Returns all the owned config values.
    *
    * @return array
+   *   The owned config.
    */
   protected function getOwnedConfig() {
     return $this->ownedConfigManager->getOwnedConfigValues();

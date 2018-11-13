@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner;
 
 use Drupal\Core\Config\ConfigManagerInterface;
@@ -15,16 +17,22 @@ use Drupal\Core\Config\StorageInterface;
 class OwnedConfigStorageComparerFactory {
 
   /**
+   * Config manager.
+   *
    * @var \Drupal\Core\Config\ConfigManagerInterface
    */
   protected $configManager;
 
   /**
+   * Active storage.
+   *
    * @var \Drupal\Core\Config\StorageInterface
    */
   protected $activeStorage;
 
   /**
+   * Owned config manager.
+   *
    * @var \Drupal\config_owner\OwnedConfigManagerInterface
    */
   protected $ownedConfigManager;
@@ -33,8 +41,11 @@ class OwnedConfigStorageComparerFactory {
    * ConfigImportCommands constructor.
    *
    * @param \Drupal\Core\Config\ConfigManagerInterface $configManager
+   *   Config manager.
    * @param \Drupal\Core\Config\StorageInterface $activeStorage
+   *   Active storage.
    * @param \Drupal\config_owner\OwnedConfigManagerInterface $ownedConfigManager
+   *   Owned config manager.
    */
   public function __construct(ConfigManagerInterface $configManager, StorageInterface $activeStorage, OwnedConfigManagerInterface $ownedConfigManager) {
     $this->configManager = $configManager;
@@ -46,6 +57,7 @@ class OwnedConfigStorageComparerFactory {
    * Creates the StorageComparer instance.
    *
    * @return \Drupal\Core\Config\StorageComparer
+   *   The storage comparer.
    */
   public function create() {
     $sync_storage = new MemoryConfigStorage();

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner\EventSubscriber;
 
 use Drupal\config_owner\OwnedConfigManagerInterface;
@@ -14,11 +16,15 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 class OwnedConfigEventSubscriber implements EventSubscriberInterface {
 
   /**
+   * Owned config manager.
+   *
    * @var \Drupal\config_owner\OwnedConfigManagerInterface
    */
   protected $ownedConfigManager;
 
   /**
+   * Cache backend.
+   *
    * @var \Drupal\Core\Cache\CacheBackendInterface
    */
   protected $cacheBackend;
@@ -27,7 +33,9 @@ class OwnedConfigEventSubscriber implements EventSubscriberInterface {
    * OwnedConfigEventSubscriber constructor.
    *
    * @param \Drupal\config_owner\OwnedConfigManagerInterface $ownedConfigManager
+   *   Owned config manager.
    * @param \Drupal\Core\Cache\CacheBackendInterface $cacheBackend
+   *   Cache backend.
    */
   public function __construct(OwnedConfigManagerInterface $ownedConfigManager, CacheBackendInterface $cacheBackend) {
     $this->ownedConfigManager = $ownedConfigManager;
@@ -48,6 +56,7 @@ class OwnedConfigEventSubscriber implements EventSubscriberInterface {
    * Listener to when there is a change on a given config.
    *
    * @param \Drupal\Core\Config\ConfigCrudEvent $event
+   *   The CRUD event.
    */
   public function onConfigCrud(ConfigCrudEvent $event) {
     if (!$this->ownedConfigManager->configIsOwned($event->getConfig()->getName())) {
@@ -56,4 +65,5 @@ class OwnedConfigEventSubscriber implements EventSubscriberInterface {
 
     $this->cacheBackend->invalidate('owned_config_values');
   }
+
 }

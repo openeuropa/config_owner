@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner\Commands;
 
 use Drupal\config_owner\OwnedConfig;
@@ -24,21 +26,29 @@ class ConfigOwnerCommands extends DrushCommands {
   use StringTranslationTrait;
 
   /**
+   * Drush config import commands.
+   *
    * @var \Drush\Drupal\Commands\config\ConfigImportCommands
    */
   protected $configImportCommands;
 
   /**
+   * Storage comparer factory.
+   *
    * @var \Drupal\config_owner\OwnedConfigStorageComparerFactory
    */
   protected $storageComparerFactory;
 
   /**
+   * Config factory.
+   *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
   /**
+   * Module handler.
+   *
    * @var \Drupal\Core\Extension\ModuleHandlerInterface
    */
   protected $moduleHandler;
@@ -47,9 +57,13 @@ class ConfigOwnerCommands extends DrushCommands {
    * ConfigImportCommands constructor.
    *
    * @param \Drush\Drupal\Commands\config\ConfigImportCommands $configImportCommands
+   *   Drush config import commands.
    * @param \Drupal\config_owner\OwnedConfigStorageComparerFactory $storageComparerFactory
+   *   Storage comparer factory.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $configFactory
+   *   Config factory.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
+   *   Module handler.
    */
   public function __construct(ConfigImportCommands $configImportCommands, OwnedConfigStorageComparerFactory $storageComparerFactory, ConfigFactoryInterface $configFactory, ModuleHandlerInterface $moduleHandler) {
     $this->configImportCommands = $configImportCommands;
@@ -73,7 +87,7 @@ class ConfigOwnerCommands extends DrushCommands {
 
     $change_list = [];
     foreach ($storage_comparer->getAllCollectionNames() as $collection) {
-      $change_list[$collection] = $storage_comparer->getChangelist(null, $collection);
+      $change_list[$collection] = $storage_comparer->getChangelist(NULL, $collection);
     }
     $table = ConfigCommands::configChangesTable($change_list, $this->output());
     $table->render();
@@ -100,7 +114,7 @@ class ConfigOwnerCommands extends DrushCommands {
    * module_name module. Leaving the arguments empty will allow you to select
    * the values interactively
    */
-  public function export($module_name, $config_name) {
+  public function export(string $module_name, string $config_name) {
     $config = $this->configFactory->get($config_name);
     if (!$config instanceof Config) {
       $this->logger()->error($this->t('The requested config does not exist.'));
@@ -126,11 +140,13 @@ class ConfigOwnerCommands extends DrushCommands {
    * Command hook to interactively select the available module names.
    *
    * @param \Drush\Symfony\DrushArgvInput $input
+   *   The command input.
    * @param \Symfony\Component\Console\Output\ConsoleOutput $output
+   *   The command output.
    *
    * @hook interact @interact-module-name
    */
-  public function interactConfigName(DrushArgvInput $input, ConsoleOutput $output) {
+  public function interactModuleName(DrushArgvInput $input, ConsoleOutput $output) {
     if (empty($input->getArgument('module_name'))) {
       $extensions = $this->moduleHandler->getModuleList();
       $choices = [];

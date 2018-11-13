@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner;
 
 use Drupal\Core\Config\FileStorage;
@@ -25,11 +27,13 @@ class OwnedConfig extends PluginBase {
   const CONFIG_OWNED_DIRECTORY = 'config/owned';
 
   /**
-   * Returns the owned config values of a given type (directory);
+   * Returns the owned config values of a given type (directory);.
    *
    * @param string $type
+   *   The type of configuration.
    *
    * @return array
+   *   The config values.
    */
   public function getOwnedConfigValuesByType(string $type) {
     $definition = $this->getPluginDefinition();
@@ -45,13 +49,18 @@ class OwnedConfig extends PluginBase {
   }
 
   /**
+   * Gets the owned config values.
+   *
    * Given an array of config definitions specified in the plugin, return the
    * owned config values that must not be changed.
    *
    * @param array $config_definitions
+   *   Config definitions from plugins.
    * @param \Drupal\Core\Config\FileStorage $storage
+   *   The file storage where the config values can be found.
    *
    * @return array
+   *   The config values.
    */
   protected function getOwnedConfigValues(array $config_definitions, FileStorage $storage) {
     $configs = [];
@@ -82,10 +91,12 @@ class OwnedConfig extends PluginBase {
    * Gets the config file storage for the module this plugin belongs to.
    *
    * @param string $location
+   *   The location of the config.
    *
-   * @return \Drupal\Core\Config\FileStorage
+   * @return \Drupal\Core\Config\StorageInterface
+   *   The storage object.
    */
-  protected function getStorage($location = self::OWNED_CONFIG_INSTALL) {
+  protected function getStorage(string $location = self::OWNED_CONFIG_INSTALL) {
     $directory_map = [
       self::OWNED_CONFIG_INSTALL => InstallStorage::CONFIG_INSTALL_DIRECTORY,
       self::OWNED_CONFIG_OPTIONAL => InstallStorage::CONFIG_OPTIONAL_DIRECTORY,
@@ -102,12 +113,15 @@ class OwnedConfig extends PluginBase {
    *
    * Plugins may define configs using wildcards so we need to match those.
    *
-   * @param $definition
-   * @param \Drupal\Core\Config\FileStorage $storage
+   * @param array $definition
+   *   The config definition.
+   * @param \Drupal\Core\Config\StorageInterface $storage
+   *   The storage object.
    *
    * @return array
+   *   The prepared config definition.
    */
-  protected function prepareConfigDefinition($definition, FileStorage $storage) {
+  protected function prepareConfigDefinition(array $definition, StorageInterface $storage) {
     $prepared = [];
     $available_names = $storage->listAll();
     foreach ($definition as $name => $info) {
@@ -118,6 +132,7 @@ class OwnedConfig extends PluginBase {
       }
 
       foreach ($available_names as $available_name) {
+        // @codingStandardsIgnoreLine
         if (fnmatch($name, $available_name)) {
           // For all the matches, we use the same info.
           $prepared[$available_name] = $info;
@@ -127,4 +142,5 @@ class OwnedConfig extends PluginBase {
 
     return $prepared;
   }
+
 }

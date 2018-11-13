@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\Tests\config_owner\Kernel;
+
 use Drupal\KernelTests\KernelTestBase;
 
 /**
@@ -38,8 +41,10 @@ class ConfigOwnerTestBase extends KernelTestBase {
    */
   protected function performDefaultConfigChanges() {
     $this->config('config_owner_test.settings')
-      ->set('main_color', 'yellow') // Owned key
-      ->set('allowed_colors', ['blue', 'orange']) // Not owned key
+    // Owned key.
+      ->set('main_color', 'yellow')
+    // Not owned key.
+      ->set('allowed_colors', ['blue', 'orange'])
       ->save();
 
     $this->config('config_owner_test.test_config.one')
