@@ -5,7 +5,47 @@ exporting/importing changes to these configurations.
 
 ## How to use
 
-The module works by exposing a YML based plugin type called Owned Config. Any module that wants to "own" some configuration, needs to create such a plugin. See the config_owner_test module as an example of using this plugin.
+The module works by exposing a YML based plugin type called Owned Config. Any module that wants to "own" some configuration, needs to create such a plugin. 
+
+In the plugin, the "owned" configuration is referenced under the relevant keys:
+
+* `install` (configuration the module ships with)
+* `optional` (optional configuration the module ships with)
+* `owned` (owned configuration that the module does not ship with)
+
+These keys map to the location inside the module's `config` directory.
+
+See the `config_owner_test` module as an example of using this plugin.
+
+The module also exposes 2 Drush commands.
+
+### Exporting config
+
+```
+drush config-owner:export 
+```
+
+This command takes two parameters (which can also be derived interactively if omitted):
+
+* The module name
+* The config name
+
+The command is used as a helper to export a given configuration object from the active storage to the module's `owned` folder. 
+
+The `owned` folder is used to store configuration objects that the module "owns" but that it cannot ship with (it can already exist in the active storage).
+
+After exporting the configuration file, its name needs to be referenced in the Owned Config plugin under the `owned` key.
+
+### Importing config
+
+```
+drush config-owner:import 
+```
+
+Owned config no longer goes through the normal configuration sync process. This means that changes to the owned configuration in the Sync (staging) storage will not be imported during the sync. 
+
+Using this command, you can import the owned configuration provided by all the modules into the active storage. So it should go hand in hand with the core `drush config-import`.
+
 
 ## Development setup
 
