@@ -6,6 +6,7 @@ config_owner_test:
     config_owner_test.test_config.*: ~
   owned:
     system.mail: ~
+    system.maintenance: ~
   optional:
     config_owner_test.optional_one: ~
     config_owner_test.optional_two: ~

@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\Tests\config_owner\Kernel;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
 
 /**
  * Base class for config owner Kernel tests.
@@ -19,6 +20,8 @@ class ConfigOwnerTestBase extends KernelTestBase {
     'config_filter',
     'config_owner',
     'config_owner_test',
+    'language',
+    'config_translation',
   ];
 
   /**
@@ -28,6 +31,9 @@ class ConfigOwnerTestBase extends KernelTestBase {
     parent::setUp();
     $this->installConfig(['system']);
     $this->installConfig(['config_owner_test']);
+
+    // Create the French language.
+    ConfigurableLanguage::createFromLangcode('fr')->save();
   }
 
   /**
@@ -60,6 +66,13 @@ class ConfigOwnerTestBase extends KernelTestBase {
     $this->config('system.site')
       ->set('name', 'The new site name')
       // The entire config is not owned.
+      ->save();
+
+    // Translate a configuration that is owned.
+    /** @var \Drupal\Core\Config\Config $config */
+    $this->container->get('language_manager')
+      ->getLanguageConfigOverride('fr', 'system.maintenance')
+      ->set('message', 'The French maintenance message')
       ->save();
   }
 

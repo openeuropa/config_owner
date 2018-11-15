@@ -4,6 +4,8 @@ declare(strict_types = 1);
 
 namespace Drupal\Tests\config_owner\Kernel;
 
+use Drupal\Core\Config\StorageInterface;
+
 /**
  * Tests the owned config storage comparer factory.
  */
@@ -17,21 +19,36 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
    * is in the original owned config files.
    */
   public function testConfigStorageComparer() {
-
     // Makes some config changes.
     $this->performDefaultConfigChanges();
 
     /** @var \Drupal\Core\Config\StorageComparer $storage_comparer */
     $storage_comparer = $this->container->get('config_owner.storage_comparer_factory')->create();
 
-    $changes = $storage_comparer->createChangelist()->getChangelist();
+    $change_list = [];
+    $storage_comparer->createChangelist();
+    foreach ($storage_comparer->getAllCollectionNames(FALSE) as $collection) {
+      $change_list[$collection] = $storage_comparer->getChangelist(NULL, $collection);
+    }
 
+    // Assert the changes in the default collection.
+    $changes = $change_list[StorageInterface::DEFAULT_COLLECTION];
     sort($changes['update']);
     $this->assertEquals([
       'config_owner_test.settings',
       'config_owner_test.test_config.one',
       'system.mail',
     ], $changes['update']);
+    $this->assertEquals(['config_owner_test.optional_one'], $changes['create']);
+    $this->assertEmpty($changes['delete']);
+    $this->assertEmpty($changes['rename']);
+
+    // Assert the changes in the French language collection.
+    $changes = $change_list['language.fr'];
+    foreach ($changes as $type => $type_changes) {
+      // No changes should exist in the language collection as it is not owned.
+      $this->assertEmpty($type_changes, "There are $type changes in the language collection");
+    }
 
     // Assert that the not-owned keys does not differ.
     $active_config = $storage_comparer->getTargetStorage()->read('config_owner_test.settings');

@@ -6,6 +6,7 @@ namespace Drupal\config_owner\Plugin\ConfigFilter;
 
 use Drupal\config_filter\Plugin\ConfigFilterBase;
 use Drupal\config_owner\OwnedConfigManagerInterface;
+use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -72,6 +73,10 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * Reading one configuration from the staging (file) storage.
    */
   public function filterRead($name, $data) {
+    if (!$this->isDefaultCollection()) {
+      return $data;
+    }
+
     $owned_configs = $this->getOwnedConfig();
     if (!isset($owned_configs[$name])) {
       return $data;
@@ -95,6 +100,10 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * Reading the entire set of configuration from the staging (file) storage.
    */
   public function filterReadMultiple(array $names, array $data) {
+    if (!$this->isDefaultCollection()) {
+      return $data;
+    }
+
     $owned_config = $this->getOwnedConfig();
     foreach (array_keys($owned_config) as $name) {
       if (isset($data[$name])) {
@@ -113,6 +122,10 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * with the owned config values.
    */
   public function filterWrite($name, array $data) {
+    if (!$this->isDefaultCollection()) {
+      return $data;
+    }
+
     $owned_config = $this->getOwnedConfig();
     if (!isset($owned_config[$name])) {
       return $data;
@@ -130,6 +143,10 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function filterDelete($name, $delete) {
+    if (!$this->isDefaultCollection()) {
+      return $delete;
+    }
+
     $owned_config = $this->getOwnedConfig();
     if (!isset($owned_config[$name])) {
       return $delete;
@@ -143,6 +160,10 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function filterRename($name, $new_name, $rename) {
+    if (!$this->isDefaultCollection()) {
+      return $rename;
+    }
+
     $owned_config = $this->getOwnedConfig();
     if (!isset($owned_config[$name])) {
       return $rename;
@@ -156,6 +177,10 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
    * {@inheritdoc}
    */
   public function filterDeleteAll($prefix, $delete) {
+    if (!$this->isDefaultCollection()) {
+      return $delete;
+    }
+
     $owned_config = $this->getOwnedConfig();
     foreach (array_keys($owned_config) as $name) {
       if ($prefix !== '' && strpos($name, $prefix) === 0) {
@@ -166,6 +191,19 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     }
 
     return TRUE;
+  }
+
+  /**
+   * Checks whether the we are filtering on the default collection.
+   *
+   * This is needed so that we can only "own" the configuration in the original
+   * language.
+   *
+   * @return bool
+   *   Whether the collection is default.
+   */
+  protected function isDefaultCollection() {
+    return $this->source->getCollectionName() === StorageInterface::DEFAULT_COLLECTION;
   }
 
   /**

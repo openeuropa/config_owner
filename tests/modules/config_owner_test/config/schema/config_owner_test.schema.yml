@@ -27,3 +27,20 @@ config_owner_test.test_config.two:
     name:
       type: string
       label: 'Name'
+
+config_owner_test.optional_one:
+  type: config_object
+  label: 'Optional test config one'
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+
+config_owner_test.optional_two:
+  type: config_object
+  label: 'Optional test config two'
+  mapping:
+    name:
+      type: string
+      label: 'Name'
+      translatable: true

@@ -60,7 +60,7 @@ class OwnedConfigStorageComparerFactory {
    *   The storage comparer.
    */
   public function create() {
-    $sync_storage = new MemoryConfigStorage();
+    $sync_storage = new MemoryConfigStorage(StorageInterface::DEFAULT_COLLECTION, $this->activeStorage);
     foreach ($this->activeStorage->listAll() as $name) {
       $sync_storage->write($name, $this->activeStorage->read($name));
     }
