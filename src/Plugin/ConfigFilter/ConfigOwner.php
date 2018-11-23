@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace Drupal\config_owner\Plugin\ConfigFilter;
 
 use Drupal\config_filter\Plugin\ConfigFilterBase;
+use Drupal\config_owner\OwnedConfigHelper;
 use Drupal\config_owner\OwnedConfigManagerInterface;
 use Drupal\Core\Config\StorageInterface;
 use Drupal\Core\DependencyInjection\DependencySerializationTrait;
@@ -86,10 +87,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     // staging storage doesn't really matter. What counts is the original owned
     // config. This will also prevent Drupal from knowing if the staging config
     // has changes compared to the original owned config.
-    $owned_config = $owned_configs[$name];
-    foreach ($owned_config as $key => $value) {
-      $data[$key] = $value;
-    }
+    $data = OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
 
     return $data;
   }
@@ -126,15 +124,12 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
       return $data;
     }
 
-    $owned_config = $this->getOwnedConfig();
-    if (!isset($owned_config[$name])) {
+    $owned_configs = $this->getOwnedConfig();
+    if (!isset($owned_configs[$name])) {
       return $data;
     }
 
-    $owned = $owned_config[$name];
-    foreach ($owned as $key => $value) {
-      $data[$key] = $value;
-    }
+    $data = OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
 
     return $data;
   }

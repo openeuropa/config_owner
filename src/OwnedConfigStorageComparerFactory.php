@@ -66,11 +66,8 @@ class OwnedConfigStorageComparerFactory {
     }
     $configs = $this->ownedConfigManager->getOwnedConfigValues();
     foreach ($configs as $name => $config) {
-      $active = $this->activeStorage->read($name);
-      foreach ($config as $key => $value) {
-        // We only update the values that are actually owned at key level.
-        $active[$key] = $value;
-      }
+      $active = (array) $this->activeStorage->read($name);
+      $active = OwnedConfigHelper::replaceConfig($active, $config);
       $sync_storage->write($name, $active);
     }
 
