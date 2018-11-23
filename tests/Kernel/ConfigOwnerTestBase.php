@@ -47,10 +47,19 @@ class ConfigOwnerTestBase extends KernelTestBase {
    */
   protected function performDefaultConfigChanges() {
     $this->config('config_owner_test.settings')
-    // Owned key.
+    // Owned keys.
       ->set('main_color', 'yellow')
+      ->set('other_colors.primary', 'brown')
+      ->set('other_colors.settings.allowed', FALSE)
     // Not owned key.
       ->set('allowed_colors', ['blue', 'orange'])
+      ->set('other_colors.secondary', 'black')
+      ->save();
+
+    $this->config('config_owner_test.tps')
+      // Third party settings which we should not own by default.
+      ->set('third_party_settings.distribution_module.colorize', FALSE)
+      ->set('content.field_three.third_party_settings.distribution_module.color', 'green')
       ->save();
 
     $this->config('config_owner_test.test_config.one')

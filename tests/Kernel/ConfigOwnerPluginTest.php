@@ -30,9 +30,11 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     // comparer.
     $changes = $this->configImporter()->getStorageComparer()->getChangelist('update');
     sort($changes);
+
     $this->assertEquals([
       'config_owner_test.settings',
       'config_owner_test.test_config.one',
+      'config_owner_test.tps',
       'system.mail',
       'system.site',
     ], $changes);
@@ -59,8 +61,19 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
 
     // Owned, so no change.
     $this->assertEquals('green', $config['main_color']);
+    $this->assertEquals('orange', $config['other_colors']['primary']);
+    $this->assertEquals([
+      'allowed' => TRUE,
+      'convert' => FALSE,
+    ], $config['other_colors']['settings']);
     // Non-owned so change.
     $this->assertEquals(['blue', 'orange'], $config['allowed_colors']);
+    $this->assertEquals('black', $config['other_colors']['secondary']);
+
+    // Non-owned third party settings.
+    $config = $sync_storage->read('config_owner_test.tps');
+    $this->assertEquals(FALSE, $config['third_party_settings']['distribution_module']['colorize']);
+    $this->assertEquals('green', $config['content']['field_three']['third_party_settings']['distribution_module']['color']);
 
     $config = $sync_storage->read('config_owner_test.test_config.one');
     // Owned so no change.
@@ -105,8 +118,12 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     $config = $sync_storage->read('config_owner_test.settings');
     // Owned.
     $config['main_color'] = 'yellow';
+    $config['other_colors']['primary'] = 'brown';
+    $config['other_colors']['settings']['allowed'] = FALSE;
+    $config['other_colors']['settings']['convert'] = TRUE;
     // Not owned key.
     $config['allowed_colors'] = ['blue', 'orange'];
+    $config['other_colors']['secondary'] = 'black';
     $sync_storage->write('config_owner_test.settings', $config);
 
     $config = $sync_storage->read('config_owner_test.test_config.one');
@@ -136,8 +153,12 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
 
     // Owned, so no change.
     $this->assertEquals('green', $this->config('config_owner_test.settings')->get('main_color'));
+    $this->assertEquals('orange', $this->config('config_owner_test.settings')->get('other_colors.primary'));
+    $this->assertEquals(TRUE, $this->config('config_owner_test.settings')->get('other_colors.settings.allowed'));
+    $this->assertEquals(FALSE, $this->config('config_owner_test.settings')->get('other_colors.settings.convert'));
     // Non-owned so change.
     $this->assertEquals(['blue', 'orange'], $this->config('config_owner_test.settings')->get('allowed_colors'));
+    $this->assertEquals('black', $this->config('config_owner_test.settings')->get('other_colors.secondary'));
     // Owned, so no change.
     $this->assertEquals('Test config one', $this->config('config_owner_test.test_config.one')->get('name'));
     // Non-owned so change.

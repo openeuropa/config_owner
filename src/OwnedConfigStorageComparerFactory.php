@@ -66,8 +66,8 @@ class OwnedConfigStorageComparerFactory {
     }
     $configs = $this->ownedConfigManager->getOwnedConfigValues();
     foreach ($configs as $name => $config) {
-      $active = (array) $this->activeStorage->read($name);
-      $active = OwnedConfigHelper::replaceConfig($active, $config);
+      $active = $this->activeStorage->read($name);
+      $active = $active ? OwnedConfigHelper::replaceConfig($active, $config) : $config;
       $sync_storage->write($name, $active);
     }
 

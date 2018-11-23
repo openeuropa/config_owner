@@ -3,7 +3,10 @@ config_owner_test:
     config_owner_test.settings:
       keys:
         - main_color
+        - other_colors.primary
+        - other_colors.settings.*
     config_owner_test.test_config.*: ~
+    config_owner_test.tps: ~
   owned:
     system.mail: ~
     system.maintenance: ~

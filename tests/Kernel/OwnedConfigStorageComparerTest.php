@@ -50,13 +50,22 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
       $this->assertEmpty($type_changes, "There are $type changes in the language collection");
     }
 
-    // Assert that the not-owned keys does not differ.
+    // Assert that the not-owned keys do not differ.
     $active_config = $storage_comparer->getTargetStorage()->read('config_owner_test.settings');
     $sync_config = $storage_comparer->getSourceStorage()->read('config_owner_test.settings');
     // Not owned.
     $this->assertEquals($active_config['allowed_colors'], $sync_config['allowed_colors']);
+    $this->assertEquals($active_config['other_colors']['secondary'], $sync_config['other_colors']['secondary']);
     // Owned.
     $this->assertNotEquals($active_config['main_color'], $sync_config['main_color']);
+    $this->assertNotEquals($active_config['other_colors']['primary'], $sync_config['other_colors']['primary']);
+    $this->assertNotEquals($active_config['other_colors']['settings'], $sync_config['other_colors']['settings']);
+
+    // Third party settings are not owned so they should be the same.
+    $active_config = $storage_comparer->getTargetStorage()->read('config_owner_test.tps');
+    $sync_config = $storage_comparer->getSourceStorage()->read('config_owner_test.tps');
+    $this->assertEquals($active_config['third_party_settings']['distribution_module']['colorize'], $sync_config['third_party_settings']['distribution_module']['colorize']);
+    $this->assertEquals($active_config['content']['field_three']['third_party_settings']['distribution_module']['color'], $sync_config['content']['field_three']['third_party_settings']['distribution_module']['color']);
 
     $active_config = $storage_comparer->getTargetStorage()->read('system.mail');
     $sync_config = $storage_comparer->getSourceStorage()->read('system.mail');

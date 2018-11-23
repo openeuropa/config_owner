@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace Drupal\config_owner;
 
+use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Config\FileStorage;
 use Drupal\Core\Config\InstallStorage;
 use Drupal\Core\Config\StorageInterface;
@@ -68,18 +69,16 @@ class OwnedConfig extends PluginBase {
       $original_config = $storage->read($name);
       if (!$info || !isset($info['keys']) || !$info['keys']) {
         // In case no keys are specified, the entire config data is considered.
-        $configs[$name] = $original_config;
+        // If by chance, the owned config ships with third party settings, we
+        // remove them from the equation.
+        $configs[$name] = OwnedConfigHelper::removeThirdPartySettings($original_config);
         continue;
       }
 
       // Otherwise, we only consider the specified keys.
       $config = [];
       foreach ($info['keys'] as $key) {
-        if (!isset($original_config[$key])) {
-          continue;
-        }
-
-        $config[$key] = $original_config[$key];
+        $config = array_merge_recursive($config, $this->unflattenKey($key, $original_config));
       }
       $configs[$name] = $config;
     }
@@ -141,6 +140,35 @@ class OwnedConfig extends PluginBase {
     }
 
     return $prepared;
+  }
+
+  /**
+   * @param string $key
+   * @param array $config
+   *
+   * @return array
+   */
+  protected function unflattenKey(string $key, array $config) {
+    $data = [];
+    $parts = explode('.', $key);
+
+    if (count($parts) == 1 && isset($config[$key])) {
+      $data[$key] = $config[$key];
+      return $data;
+    }
+
+    if (in_array('*', $parts)) {
+      // We are dealing with a wildcard at the end.
+      array_pop($parts);
+    }
+
+    $value = NestedArray::getValue($config, $parts, $key_exists);
+    if ($key_exists) {
+      // Enforce the value if it existed in the active config.
+      NestedArray::setValue($data, $parts, $value, TRUE);
+    }
+
+    return $data;
   }
 
 }
