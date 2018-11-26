@@ -35,6 +35,7 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
       'config_owner_test.settings',
       'config_owner_test.test_config.one',
       'config_owner_test.tps',
+      'config_owner_test.tps_ignore',
       'system.mail',
       'system.site',
     ], $changes);
@@ -70,10 +71,15 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     $this->assertEquals(['blue', 'orange'], $config['allowed_colors']);
     $this->assertEquals('black', $config['other_colors']['secondary']);
 
-    // Non-owned third party settings.
+    // Non-owned third party settings so change.
     $config = $sync_storage->read('config_owner_test.tps');
     $this->assertEquals(FALSE, $config['third_party_settings']['distribution_module']['colorize']);
     $this->assertEquals('green', $config['content']['field_three']['third_party_settings']['distribution_module']['color']);
+
+    // Owned third party settings, so no change
+    $config = $sync_storage->read('config_owner_test.tps_ignore');
+    $this->assertEquals('red', $config['third_party_settings']['distribution_module']['color']);
+    $this->assertEquals(FALSE, $config['content']['field_one']['third_party_settings']['distribution_module']['colorize']);
 
     $config = $sync_storage->read('config_owner_test.test_config.one');
     // Owned so no change.
@@ -141,6 +147,18 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     $config['message'] = 'Dummy maintenance message.';
     $sync_storage->write('system.maintenance', $config);
 
+    // Third party settings should be not owned by default.
+    $config = $sync_storage->read('config_owner_test.tps');
+    $config['third_party_settings']['distribution_module']['colorize'] = TRUE;
+    $config['content']['field_three']['third_party_settings']['distribution_module']['color'] = 'green';
+    $sync_storage->write('config_owner_test.tps', $config);
+
+    // Specified third party settings should be owned.
+    $config = $sync_storage->read('config_owner_test.tps_ignore');
+    $config['third_party_settings']['distribution_module']['color'] = 'green';
+    $config['content']['field_one']['third_party_settings']['distribution_module']['colorize'] = TRUE;
+    $sync_storage->write('config_owner_test.tps_owner', $config);
+
     // We need to create the folder for the collection config sync folder.
     mkdir($this->siteDirectory . '/files/config/' . CONFIG_SYNC_DIRECTORY . '/language/fr', 0775, TRUE);
     $sync_storage_french = $sync_storage->createCollection('language.fr');
@@ -163,6 +181,14 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     $this->assertEquals('Test config one', $this->config('config_owner_test.test_config.one')->get('name'));
     // Non-owned so change.
     $this->assertEquals('The new site name', $this->config('system.site')->get('name'));
+
+    // Third party not owned, so change.
+    $this->assertEquals(TRUE, $this->config('config_owner_test.tps')->get('third_party_settings.distribution_module.colorize'));
+    $this->assertEquals('green', $this->config('config_owner_test.tps')->get('content.field_three.third_party_settings.distribution_module.color'));
+
+    // Owned third party settings, so no change.
+    $this->assertEquals(FALSE, $this->config('config_owner_test.tps_ignore')->get('content.field_one.third_party_settings.distribution_module.colorize'));
+    $this->assertEquals('red', $this->config('config_owner_test.tps_ignore')->get('third_party_settings.distribution_module.color'));
 
     // Translated "owned" config changes should be imported, but not changes to
     // the original one.

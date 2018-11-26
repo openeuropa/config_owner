@@ -37,6 +37,7 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
     $this->assertEquals([
       'config_owner_test.settings',
       'config_owner_test.test_config.one',
+      'config_owner_test.tps_ignore',
       'system.mail',
     ], $changes['update']);
     $this->assertEquals(['config_owner_test.optional_one'], $changes['create']);
@@ -66,6 +67,12 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
     $sync_config = $storage_comparer->getSourceStorage()->read('config_owner_test.tps');
     $this->assertEquals($active_config['third_party_settings']['distribution_module']['colorize'], $sync_config['third_party_settings']['distribution_module']['colorize']);
     $this->assertEquals($active_config['content']['field_three']['third_party_settings']['distribution_module']['color'], $sync_config['content']['field_three']['third_party_settings']['distribution_module']['color']);
+
+    // Specified third party settings are owned so they should show a difference.
+    $active_config = $storage_comparer->getTargetStorage()->read('config_owner_test.tps_ignore');
+    $sync_config = $storage_comparer->getSourceStorage()->read('config_owner_test.tps_ignore');
+    $this->assertNotEquals($active_config['third_party_settings']['distribution_module']['color'], $sync_config['third_party_settings']['distribution_module']['color']);
+    $this->assertNotEquals($active_config['content']['field_one']['third_party_settings']['distribution_module']['colorize'], $sync_config['content']['field_one']['third_party_settings']['distribution_module']['colorize']);
 
     $active_config = $storage_comparer->getTargetStorage()->read('system.mail');
     $sync_config = $storage_comparer->getSourceStorage()->read('system.mail');

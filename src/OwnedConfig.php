@@ -67,7 +67,7 @@ class OwnedConfig extends PluginBase {
     $configs = [];
     foreach ($config_definitions as $name => $info) {
       $original_config = $storage->read($name);
-      if (!$info || !isset($info['keys']) || !$info['keys']) {
+      if (!$info) {
         // In case no keys are specified, the entire config data is considered.
         // If by chance, the owned config ships with third party settings, we
         // remove them from the equation.
@@ -75,12 +75,42 @@ class OwnedConfig extends PluginBase {
         continue;
       }
 
-      // Otherwise, we only consider the specified keys.
-      $config = [];
-      foreach ($info['keys'] as $key) {
-        $config = array_merge_recursive($config, $this->unflattenKey($key, $original_config));
+      // If there is no wildcard key, it means that we have a regular key-based
+      // specification.
+      if (!in_array('*', $info)) {
+        $config = [];
+        foreach ($info as $key) {
+          $config = array_merge_recursive($config, $this->unflattenKey($key, $original_config));
+        }
+        $configs[$name] = $config;
+        continue;
       }
-      $configs[$name] = $config;
+
+      // If there is a wildcard key, we consider the entire config. However,
+      // this is normally only present when we want to own a third party setting
+      // which otherwise would be ignored. So we need to check for that.
+      $third_party_keys = [];
+      $third_party_config = [];
+      foreach ($info as $key) {
+        if (strpos($key, 'third_party_settings') !== FALSE) {
+          $third_party_config = array_merge_recursive($third_party_config, $this->unflattenKey($key, $original_config));
+        }
+      }
+
+      if ($third_party_config) {
+        $third_party_keys = array_keys(OwnedConfigHelper::flattenConfig($third_party_config));
+      }
+
+      if ($third_party_keys) {
+        // We remove the third party keys (except the ones we want to still own).
+        // Wildcards in the third party key specification is not allowed.
+        $configs[$name] = OwnedConfigHelper::removeThirdPartySettings($original_config, $third_party_keys);
+        continue;
+      }
+
+      // If no third party keys were actually set, we ignore this and treat
+      // it as a full config.
+      $configs[$name] = OwnedConfigHelper::removeThirdPartySettings($original_config);
     }
 
     return $configs;

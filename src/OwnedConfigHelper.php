@@ -76,13 +76,18 @@ class OwnedConfigHelper {
 
   /**
    * @param array $config
+   * @param array $ignored_keys
    *
    * @return array
    */
-  public static function removeThirdPartySettings(array $config) {
+  public static function removeThirdPartySettings(array $config, $ignored_keys = []) {
     $flat = static::flattenConfig($config);
     foreach (array_keys($flat) as $key) {
       if (strpos($key, 'third_party_settings.') === FALSE) {
+        continue;
+      }
+
+      if (in_array($key, $ignored_keys)) {
         continue;
       }
 
