@@ -76,7 +76,7 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     $this->assertEquals(FALSE, $config['third_party_settings']['distribution_module']['colorize']);
     $this->assertEquals('green', $config['content']['field_three']['third_party_settings']['distribution_module']['color']);
 
-    // Owned third party settings, so no change
+    // Owned third party settings, so no change.
     $config = $sync_storage->read('config_owner_test.tps_ignore');
     $this->assertEquals('red', $config['third_party_settings']['distribution_module']['color']);
     $this->assertEquals(FALSE, $config['content']['field_one']['third_party_settings']['distribution_module']['colorize']);

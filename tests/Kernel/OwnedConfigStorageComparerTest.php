@@ -68,7 +68,8 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
     $this->assertEquals($active_config['third_party_settings']['distribution_module']['colorize'], $sync_config['third_party_settings']['distribution_module']['colorize']);
     $this->assertEquals($active_config['content']['field_three']['third_party_settings']['distribution_module']['color'], $sync_config['content']['field_three']['third_party_settings']['distribution_module']['color']);
 
-    // Specified third party settings are owned so they should show a difference.
+    // Specified third party settings are owned so they should show a
+    // difference.
     $active_config = $storage_comparer->getTargetStorage()->read('config_owner_test.tps_ignore');
     $sync_config = $storage_comparer->getSourceStorage()->read('config_owner_test.tps_ignore');
     $this->assertNotEquals($active_config['third_party_settings']['distribution_module']['color'], $sync_config['third_party_settings']['distribution_module']['color']);

@@ -70,8 +70,7 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
   public function getOwnedConfigValues() {
     $cache = $this->cacheBackend->get('owned_config_values');
     if ($cache && $cache->data) {
-
-//      return $cache->data;
+      return $cache->data;
     }
 
     $types = $this->getOwnedConfigTypes();

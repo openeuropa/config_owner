@@ -102,8 +102,8 @@ class OwnedConfig extends PluginBase {
       }
 
       if ($third_party_keys) {
-        // We remove the third party keys (except the ones we want to still own).
-        // Wildcards in the third party key specification is not allowed.
+        // We remove the third party keys (except the ones we want to still
+        // own). Wildcards in the third party key specification is not allowed.
         $configs[$name] = OwnedConfigHelper::removeThirdPartySettings($original_config, $third_party_keys);
         continue;
       }
@@ -173,10 +173,15 @@ class OwnedConfig extends PluginBase {
   }
 
   /**
+   * Unflattens a key and returns the config values under that key.
+   *
    * @param string $key
+   *   The key to unflatten.
    * @param array $config
+   *   The config values to look into.
    *
    * @return array
+   *   The config values under the key.
    */
   protected function unflattenKey(string $key, array $config) {
     $data = [];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Drupal\config_owner;
 
 use Drupal\Component\Utility\NestedArray;
@@ -19,9 +21,12 @@ class OwnedConfigHelper {
    * be replaced unless they are specifically mentioned.
    *
    * @param array $config
+   *   The configuration to be replaced.
    * @param array $owned
+   *   The owned configuration values.
    *
    * @return array
+   *   The resulting configuration values.
    */
   public static function replaceConfig(array $config, array $owned) {
     foreach ($config as $key => $value) {
@@ -54,11 +59,13 @@ class OwnedConfigHelper {
   }
 
   /**
-   * Flattens the config using a dot(.) noation.
+   * Flattens the config using a dot(.) notation.
    *
    * @param array $config
+   *   The configuration values to flatten.
    *
    * @return array
+   *   The flattened array.
    */
   public static function flattenConfig(array $config): array {
     $iterator = new RecursiveIteratorIterator(new RecursiveArrayIterator($config));
@@ -75,12 +82,17 @@ class OwnedConfigHelper {
   }
 
   /**
+   * Removes the third party settings from a config.
+   *
    * @param array $config
+   *   The configuration to remove from.
    * @param array $ignored_keys
+   *   Specific third party settings keys not to remove.
    *
    * @return array
+   *   The resulting array.
    */
-  public static function removeThirdPartySettings(array $config, $ignored_keys = []) {
+  public static function removeThirdPartySettings(array $config, array $ignored_keys = []) {
     $flat = static::flattenConfig($config);
     foreach (array_keys($flat) as $key) {
       if (strpos($key, 'third_party_settings.') === FALSE) {
