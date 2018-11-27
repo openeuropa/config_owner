@@ -108,6 +108,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
         $data[$name] = $this->filterRead($name, $data[$name]);
       }
     }
+
     return $data;
   }
 
@@ -129,9 +130,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
       return $data;
     }
 
-    $data = OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
-
-    return $data;
+    return OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
   }
 
   /**

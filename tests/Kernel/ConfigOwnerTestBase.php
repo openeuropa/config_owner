@@ -20,8 +20,8 @@ class ConfigOwnerTestBase extends KernelTestBase {
     'config_filter',
     'config_owner',
     'config_owner_test',
-    'language',
     'config_translation',
+    'language',
   ];
 
   /**

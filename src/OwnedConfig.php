@@ -134,6 +134,7 @@ class OwnedConfig extends PluginBase {
 
     $directory = $directory_map[$location];
     $path = drupal_get_path('module', $this->getPluginDefinition()['provider']);
+
     return new FileStorage($path . '/' . $directory, StorageInterface::DEFAULT_COLLECTION);
   }
 
@@ -151,8 +152,9 @@ class OwnedConfig extends PluginBase {
    *   The prepared config definition.
    */
   protected function prepareConfigDefinition(array $definition, StorageInterface $storage) {
-    $prepared = [];
     $available_names = $storage->listAll();
+
+    $prepared = [];
     foreach ($definition as $name => $info) {
       if ($storage->exists($name)) {
         // In this case the full config name was defined.

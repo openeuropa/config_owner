@@ -13,7 +13,7 @@ The module works by exposing a YML based plugin type called Owned Config. Any mo
 In the plugin, the "owned" configuration is referenced under three relevant sections:
 
 * `install` -> configuration the module ships with by in the `config/install` folder.
-* `optional` -> optional configuration the module ships with in the `confug/optional` folder.
+* `optional` -> optional configuration the module ships with in the `config/optional` folder.
 * `owned` -> specific configuration that the module does not ship with (gets already installed by another module for example) but wants to own. See the Drush command for how to export such configuration into the `config/owned` folder.
 
 These keys map to the location inside the module's `config` directory of the module.

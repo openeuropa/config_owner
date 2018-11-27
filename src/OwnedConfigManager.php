@@ -109,6 +109,7 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
    */
   public function configIsOwned(string $name) {
     $config = $this->getOwnedConfigValues();
+
     return isset($config[$name]);
   }
 
@@ -136,6 +137,7 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
       $this->discovery->addTranslatableProperty('label', 'label_context');
       $this->discovery = new ContainerDerivativeDiscoveryDecorator($this->discovery);
     }
+
     return $this->discovery;
   }
 
@@ -147,6 +149,8 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
    *
    * @return array
    *   The flattened config data.
+   *
+   * @throws PluginException
    */
   protected function flattenConfigs(array $configs) {
     $flat = [];

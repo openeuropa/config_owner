@@ -65,7 +65,12 @@ class ConfigOwnerCommands extends DrushCommands {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   Module handler.
    */
-  public function __construct(ConfigImportCommands $configImportCommands, OwnedConfigStorageComparerFactory $storageComparerFactory, ConfigFactoryInterface $configFactory, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(
+    ConfigImportCommands $configImportCommands,
+    OwnedConfigStorageComparerFactory $storageComparerFactory,
+    ConfigFactoryInterface $configFactory,
+    ModuleHandlerInterface $moduleHandler
+  ) {
     $this->configImportCommands = $configImportCommands;
     $this->storageComparerFactory = $storageComparerFactory;
     $this->configFactory = $configFactory;
@@ -73,13 +78,12 @@ class ConfigOwnerCommands extends DrushCommands {
   }
 
   /**
-   * Imports all the owned configs into the active storage.
+   * Import owned config from a config directory.
    *
    * @command config-owner:import
    */
   public function import() {
     $storage_comparer = $this->storageComparerFactory->create();
-
     if (!$storage_comparer->createChangelist()->hasChanges()) {
       $this->logger()->notice(('There are no changes to import.'));
       return;
@@ -89,6 +93,7 @@ class ConfigOwnerCommands extends DrushCommands {
     foreach ($storage_comparer->getAllCollectionNames() as $collection) {
       $change_list[$collection] = $storage_comparer->getChangelist(NULL, $collection);
     }
+
     $table = ConfigCommands::configChangesTable($change_list, $this->output());
     $table->render();
 
@@ -98,7 +103,7 @@ class ConfigOwnerCommands extends DrushCommands {
   }
 
   /**
-   * Exports a configuration object to a module's config "owned" folder.
+   * Export configuration to a module's config "owned" folder.
    *
    * @param string $module_name
    *   Optional.
@@ -111,8 +116,8 @@ class ConfigOwnerCommands extends DrushCommands {
    * @command config-owner:export
    * @usage drush config-owner:export module_name system.site
    *   Exports the system.site config object to the "owned" folder of the
-   * module_name module. Leaving the arguments empty will allow you to select
-   * the values interactively
+   *   module_name module. Leaving the arguments empty will allow you to select
+   *   the values interactively
    */
   public function export(string $module_name, string $config_name) {
     $config = $this->configFactory->get($config_name);
@@ -126,14 +131,20 @@ class ConfigOwnerCommands extends DrushCommands {
       return;
     }
 
-    $directory = OwnedConfig::CONFIG_OWNED_DIRECTORY;
-    $path = drupal_get_path('module', $module_name);
-    $storage = new FileStorage($path . '/' . $directory, StorageInterface::DEFAULT_COLLECTION);
     $raw = $config->getRawData();
     unset($raw['uuid']);
     unset($raw['_core']);
+
+    $path = drupal_get_path('module', $module_name) . '/' . OwnedConfig::CONFIG_OWNED_DIRECTORY;
+    $storage = new FileStorage($path, StorageInterface::DEFAULT_COLLECTION);
     $storage->write($config_name, $raw);
-    $this->logger()->success($this->t('The configuration "@config_name" has been written to the module "@module_name".', ['@config_name' => $config_name, '@module_name' => $this->moduleHandler->getName($module_name)])->render());
+
+    $this->logger()->success(
+        $this->t(
+          'The configuration "@config_name" has been written to the module "@module_name".',
+          ['@config_name' => $config_name, '@module_name' => $this->moduleHandler->getName($module_name)]
+        )->render()
+      );
   }
 
   /**
@@ -148,11 +159,11 @@ class ConfigOwnerCommands extends DrushCommands {
    */
   public function interactModuleName(DrushArgvInput $input, ConsoleOutput $output) {
     if (empty($input->getArgument('module_name'))) {
-      $extensions = $this->moduleHandler->getModuleList();
       $choices = [];
-      foreach ($extensions as $name => $extension) {
+      foreach ($this->moduleHandler->getModuleList() as $name => $extension) {
         $choices[$name] = $extension->getName();
       }
+
       $choice = $this->io()->choice('Choose a module', $choices);
       $input->setArgument('module_name', $choice);
     }

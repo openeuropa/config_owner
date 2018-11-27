@@ -54,9 +54,11 @@ class ConfigDependencyValidator {
    */
   public function validateDependencies(string $config_name, array $data, array $all_config = []) {
     $enabled_extensions = $this->getEnabledExtensions();
+
     if (!isset($data['dependencies'])) {
       // Simple config or a config entity without dependencies.
       list($provider) = explode('.', $config_name, 2);
+
       return in_array($provider, $enabled_extensions, TRUE);
     }
 
@@ -65,6 +67,7 @@ class ConfigDependencyValidator {
     }
 
     $missing = $this->getMissingDependencies($config_name, $data, $enabled_extensions, $all_config);
+
     return empty($missing);
   }
 
@@ -86,9 +89,8 @@ class ConfigDependencyValidator {
    * @SuppressWarnings(PHPMD.CyclomaticComplexity)
    */
   protected function getMissingDependencies(string $config_name, array $data, array $enabled_extensions, array $all_config) {
-    $missing = [];
     if (!isset($data['dependencies'])) {
-      return $missing;
+      return [];
     }
 
     list($provider) = explode('.', $config_name, 2);
@@ -105,6 +107,7 @@ class ConfigDependencyValidator {
       $all_dependencies['module'][] = $provider;
     }
 
+    $missing = [];
     foreach ($all_dependencies as $type => $dependencies) {
       $list_to_check = [];
       switch ($type) {
@@ -117,6 +120,7 @@ class ConfigDependencyValidator {
           $list_to_check = $all_config;
           break;
       }
+
       if (!empty($list_to_check)) {
         $missing = array_merge($missing, array_diff($dependencies, $list_to_check));
       }
@@ -135,6 +139,7 @@ class ConfigDependencyValidator {
     $extension_config = $this->configFactory->get('core.extension');
     $enabled_extensions = (array) $extension_config->get('module');
     $enabled_extensions += (array) $extension_config->get('theme');
+
     // Core can provide configuration.
     $enabled_extensions['core'] = 'core';
 

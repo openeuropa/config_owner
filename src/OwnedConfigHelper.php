@@ -75,6 +75,7 @@ class OwnedConfigHelper {
       foreach (range(0, $iterator->getDepth()) as $depth) {
         $keys[] = $iterator->getSubIterator($depth)->key();
       }
+
       $flat[implode('.', $keys)] = $leaf;
     }
 
@@ -111,6 +112,7 @@ class OwnedConfigHelper {
       $parents = array_slice($parts, 0, $key + 1, TRUE);
       $third_party_settings_parents[] = implode('.', $parents);
     }
+
     $third_party_settings_parents = array_unique($third_party_settings_parents);
 
     // Next, we need to identify the third party settings we want to remove
