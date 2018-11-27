@@ -85,7 +85,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
 
     // For owned config, we want to make sure that whatever is read from the
     // staging storage doesn't really matter. What counts is the original owned
-    // config. This will also prevent Drupal from knowing if the staging config
+    // config. This will also prevent Drupal from knowing if the staged config
     // has changes compared to the original owned config.
     $data = OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
 
@@ -189,7 +189,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
   }
 
   /**
-   * Checks whether the we are filtering on the default collection.
+   * Checks whether we are filtering on the default collection.
    *
    * This is needed so that we can only "own" the configuration in the original
    * language.
