@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace Drupal\config_owner;
 
 use Drupal\Component\Plugin\Exception\PluginException;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Discovery\ContainerDerivativeDiscoveryDecorator;
@@ -17,13 +16,25 @@ use Drupal\Core\Plugin\Discovery\YamlDiscovery;
 class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigManagerInterface {
 
   /**
+   * {@inheritdoc}
+   *
+   * We do not want to cache these plugins because they need to be picked up
+   * as soon as changes are made to the actual YML files. This will ensure that
+   * people can run the drush config-import and drush config-owner:import
+   * commands as soon as they pull the new code changes.
+   */
+  protected $useCaches = FALSE;
+
+  /**
    * Provides default values for all owned_config plugins.
    *
    * @var array
    */
   protected $defaults = [
     'id' => '',
-    'install' => '',
+    'install' => [],
+    'optional' => [],
+    'owned' => [],
   ];
 
   /**
@@ -38,15 +49,11 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
    *
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler.
-   * @param \Drupal\Core\Cache\CacheBackendInterface $cache_backend
-   *   Cache backend instance to use.
    * @param \Drupal\config_owner\ConfigDependencyValidator $config_dependency_validator
    *   The config dependency validator.
    */
-  public function __construct(ModuleHandlerInterface $module_handler, CacheBackendInterface $cache_backend, ConfigDependencyValidator $config_dependency_validator) {
-    // Add more services as required.
+  public function __construct(ModuleHandlerInterface $module_handler, ConfigDependencyValidator $config_dependency_validator) {
     $this->moduleHandler = $module_handler;
-    $this->setCacheBackend($cache_backend, 'owned_config', ['owned_config']);
     $this->configDependencyValidator = $config_dependency_validator;
   }
 
@@ -68,11 +75,6 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
    * {@inheritdoc}
    */
   public function getOwnedConfigValues() {
-    $cache = $this->cacheBackend->get('owned_config_values');
-    if ($cache && $cache->data) {
-      return $cache->data;
-    }
-
     $types = $this->getOwnedConfigTypes();
     $configs = [];
 
@@ -98,8 +100,6 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
     }
 
     $configs = $this->flattenConfigs($configs);
-
-    $this->cacheBackend->set('owned_config_values', $configs);
 
     return $configs;
   }
