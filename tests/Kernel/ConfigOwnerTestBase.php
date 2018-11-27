@@ -66,6 +66,9 @@ class ConfigOwnerTestBase extends KernelTestBase {
       // Third party settings which we should own because we specified them.
       ->set('third_party_settings.distribution_module.color', 'green')
       ->set('content.field_one.third_party_settings.distribution_module.colorize', TRUE)
+      ->set('content.field_two.third_party_settings.distribution_module.colorize', TRUE)
+      // This we don't own so the change should take effect.
+      ->set('content.field_two.third_party_settings.distribution_module.color', 'black')
       ->save();
 
     $this->config('config_owner_test.test_config.one')

@@ -10,7 +10,10 @@ content:
         colorize: false
   field_two:
     label: above
-    third_party_settings: {  }
+    third_party_settings:
+      distribution_module:
+        colorize: false
+        color: orange
   field_three:
     label: above
     third_party_settings: {  }

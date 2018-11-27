@@ -74,6 +74,9 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
     $sync_config = $storage_comparer->getSourceStorage()->read('config_owner_test.tps_ignore');
     $this->assertNotEquals($active_config['third_party_settings']['distribution_module']['color'], $sync_config['third_party_settings']['distribution_module']['color']);
     $this->assertNotEquals($active_config['content']['field_one']['third_party_settings']['distribution_module']['colorize'], $sync_config['content']['field_one']['third_party_settings']['distribution_module']['colorize']);
+    $this->assertNotEquals($active_config['content']['field_two']['third_party_settings']['distribution_module']['colorize'], $sync_config['content']['field_two']['third_party_settings']['distribution_module']['colorize']);
+    // The one not owned key in the third party should not be changed.
+    $this->assertEquals($active_config['content']['field_two']['third_party_settings']['distribution_module']['color'], $sync_config['content']['field_two']['third_party_settings']['distribution_module']['color']);
 
     $active_config = $storage_comparer->getTargetStorage()->read('system.mail');
     $sync_config = $storage_comparer->getSourceStorage()->read('system.mail');

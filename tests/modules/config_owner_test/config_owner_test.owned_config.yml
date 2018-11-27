@@ -10,6 +10,7 @@ config_owner_test:
       - '*'
       - third_party_settings.distribution_module
       - content.field_one.third_party_settings.distribution_module
+      - content.field_two.third_party_settings.distribution_module.colorize
   owned:
     system.mail: ~
     system.maintenance: ~
