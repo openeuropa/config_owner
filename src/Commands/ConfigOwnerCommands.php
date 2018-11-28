@@ -65,12 +65,7 @@ class ConfigOwnerCommands extends DrushCommands {
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
    *   Module handler.
    */
-  public function __construct(
-    ConfigImportCommands $configImportCommands,
-    OwnedConfigStorageComparerFactory $storageComparerFactory,
-    ConfigFactoryInterface $configFactory,
-    ModuleHandlerInterface $moduleHandler
-  ) {
+  public function __construct(ConfigImportCommands $configImportCommands, OwnedConfigStorageComparerFactory $storageComparerFactory, ConfigFactoryInterface $configFactory, ModuleHandlerInterface $moduleHandler) {
     $this->configImportCommands = $configImportCommands;
     $this->storageComparerFactory = $storageComparerFactory;
     $this->configFactory = $configFactory;
@@ -78,7 +73,7 @@ class ConfigOwnerCommands extends DrushCommands {
   }
 
   /**
-   * Import owned config from a config directory.
+   * Imports all the owned configs into the active storage.
    *
    * @command config-owner:import
    */
@@ -139,12 +134,7 @@ class ConfigOwnerCommands extends DrushCommands {
     $storage = new FileStorage($path, StorageInterface::DEFAULT_COLLECTION);
     $storage->write($config_name, $raw);
 
-    $this->logger()->success(
-        $this->t(
-          'The configuration "@config_name" has been written to the module "@module_name".',
-          ['@config_name' => $config_name, '@module_name' => $this->moduleHandler->getName($module_name)]
-        )->render()
-      );
+    $this->logger()->success($this->t('The configuration "@config_name" has been written to the module "@module_name".', ['@config_name' => $config_name, '@module_name' => $this->moduleHandler->getName($module_name)])->render());
   }
 
   /**

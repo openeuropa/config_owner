@@ -9,7 +9,7 @@ use Drupal\Core\Config\StorageInterface;
 /**
  * A storage that keeps the configuration in memory.
  *
- * This can be used primarily for adhoc comparison of configuration storage.
+ * This can be used primarily for adhoc comparison of configuration storages.
  */
 class MemoryConfigStorage implements StorageInterface {
 

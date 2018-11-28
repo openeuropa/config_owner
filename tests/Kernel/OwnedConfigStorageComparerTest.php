@@ -57,7 +57,7 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
     // Non-owned settings -> no difference.
     $this->assertEquals($active_config['allowed_colors'], $sync_config['allowed_colors']);
     $this->assertEquals($active_config['other_colors']['secondary'], $sync_config['other_colors']['secondary']);
-    // Owned settings -> difference.
+    // Owned config -> difference.
     $this->assertNotEquals($active_config['main_color'], $sync_config['main_color']);
     $this->assertNotEquals($active_config['other_colors']['primary'], $sync_config['other_colors']['primary']);
     $this->assertNotEquals($active_config['other_colors']['settings'], $sync_config['other_colors']['settings']);
@@ -79,7 +79,7 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
 
     $active_config = $storage_comparer->getTargetStorage()->read('system.mail');
     $sync_config = $storage_comparer->getSourceStorage()->read('system.mail');
-    // Owned settings -> difference.
+    // Owned config -> difference.
     $this->assertNotEquals($active_config['interface'], $sync_config['interface']);
 
     // Assert that the sync config (owned) only contains the optional config

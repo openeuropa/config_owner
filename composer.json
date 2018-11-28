@@ -7,7 +7,6 @@
     "prefer-stable": true,
     "require": {
         "drupal/config_filter": "^1.4",
-        "openeuropa/drupal-core-require-dev": "^8.6",
         "php": "^7.1"
     },
     "require-dev": {

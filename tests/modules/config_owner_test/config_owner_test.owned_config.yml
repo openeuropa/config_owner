@@ -14,8 +14,6 @@ config_owner_test:
   owned:
     system.mail: ~
     system.maintenance: ~
-    system.theme:
-      - default
   optional:
     config_owner_test.optional_one: ~
     config_owner_test.optional_two: ~
