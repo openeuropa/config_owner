@@ -1,4 +1,0 @@
-name: "Optional One"
-dependencies:
-  config:
-    - system.mail

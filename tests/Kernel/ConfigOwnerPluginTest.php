@@ -20,6 +20,9 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
   public function testConfigOwnerWrite() {
     /** @var \Drupal\Core\Config\StorageInterface $active_storage */
     $active_storage = $this->container->get('config.storage');
+    // Delete the imported "new" config to mimic a new config not yet in the
+    // storage.
+    $active_storage->delete('config_owner_test.new');
     /** @var \Drupal\Core\Config\StorageInterface $sync_storage */
     $sync_storage = $this->container->get('config.storage.sync');
 
@@ -40,6 +43,13 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
       'config_owner_test.tps_ignore',
       'system.mail',
       'system.site',
+    ], $changes);
+
+    // The "new" config should show up as "to be created" as it's owned but not
+    // yet in any of the storages.
+    $changes = $this->configImporter()->getStorageComparer()->getChangelist('create');
+    $this->assertEquals([
+      'config_owner_test.new',
     ], $changes);
 
     /** @var \Drupal\Core\Config\StorageInterface[] $active_storages */
@@ -131,6 +141,10 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
   public function testConfigOwnerRead() {
     /** @var \Drupal\Core\Config\StorageInterface $active_storage */
     $active_storage = $this->container->get('config.storage');
+    // Delete the imported "new" config to mimic a new config not yet in the
+    // storage.
+    $active_storage->delete('config_owner_test.new');
+
     /** @var \Drupal\Core\Config\StorageInterface $sync_storage */
     $sync_storage = $this->container->get('config.storage.sync');
 
@@ -221,6 +235,10 @@ class ConfigOwnerPluginTest extends ConfigOwnerTestBase {
     $this->assertEquals('@site is currently under maintenance. We should be back shortly. Thank you for your patience.', $this->config('system.maintenance')->get('message'));
     $this->container->get('language_manager')->getLanguageConfigOverride('fr', 'system.maintenance');
     $this->assertEquals('Maintenance message in FR.', $this->container->get('language_manager')->getLanguageConfigOverride('fr', 'system.maintenance')->get('message'));
+
+    // Owned "new" config that is not in the either storages, should be listed
+    // and read by the filtered storage.
+    $this->assertEquals('This config is owned but does not yet exist in the site\'s sync storage.', $sync_storage->read('config_owner_test.new')['name']);
   }
 
 }

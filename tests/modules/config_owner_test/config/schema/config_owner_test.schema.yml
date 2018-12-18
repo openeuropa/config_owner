@@ -115,3 +115,11 @@ config_owner_test.tps:
 config_owner_test.tps_ignore:
   type: config_owner_test.tps
   label: 'Test config for ignoring third party settings'
+
+config_owner_test.new:
+  type: config_object
+  label: 'Test config new'
+  mapping:
+    name:
+      type: string
+      label: 'Name'

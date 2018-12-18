@@ -163,7 +163,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
   public function filterListAll($prefix, array $data) {
     $owned = $this->getOwnedConfig();
     foreach (array_keys($owned) as $name) {
-      if (!in_array($name, $data) && strpos($name, $prefix) === 0) {
+      if (!in_array($name, $data) && ($prefix === "" || strpos($name, $prefix) === 0)) {
         $data[] = $name;
       }
     }
@@ -198,7 +198,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
 
     $owned_config = $this->getOwnedConfig();
     foreach (array_keys($owned_config) as $name) {
-      if ($prefix !== '' && strpos($name, $prefix) === 0) {
+      if ($prefix !== '' && ($prefix === "" || strpos($name, $prefix) === 0)) {
         // If the prefix would delete any of the owned configs, we must not
         // allow this operation.
         return FALSE;
