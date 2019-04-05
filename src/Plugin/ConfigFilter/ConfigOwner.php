@@ -71,7 +71,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    *
-   * Reading one configuration from the staging (file) storage.
+   * Reading one configuration from the sync (file) storage.
    */
   public function filterRead($name, $data) {
     if (!$this->isDefaultCollection()) {
@@ -88,8 +88,8 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     // config. This will also prevent Drupal from knowing if the staged config
     // has changes compared to the original owned config.
     if ($data === FALSE) {
-      // In case the sync storage doesn't have a certain owned config, we add
-      // filter it in.
+      // In case the sync storage doesn't have a certain owned config,
+      // we add it.
       return $owned_configs[$name];
     }
     $data = OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
@@ -197,8 +197,13 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     }
 
     $owned_config = $this->getOwnedConfig();
+    if ($prefix === '' && !empty($owned_config)) {
+      // Don't allow to delete all configuration.
+      return FALSE;
+    }
+
     foreach (array_keys($owned_config) as $name) {
-      if ($prefix !== '' && ($prefix === "" || strpos($name, $prefix) === 0)) {
+      if (strpos($name, $prefix) === 0) {
         // If the prefix would delete any of the owned configs, we must not
         // allow this operation.
         return FALSE;
