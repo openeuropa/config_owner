@@ -71,7 +71,7 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    *
-   * Reading one configuration from the staging (file) storage.
+   * Reading one configuration from the sync (file) storage.
    */
   public function filterRead($name, $data) {
     if (!$this->isDefaultCollection()) {
@@ -84,9 +84,14 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     }
 
     // For owned config, we want to make sure that whatever is read from the
-    // staging storage doesn't really matter. What counts is the original owned
+    // sync storage doesn't really matter. What counts is the original owned
     // config. This will also prevent Drupal from knowing if the staged config
     // has changes compared to the original owned config.
+    if ($data === FALSE) {
+      // In case the sync storage doesn't have a certain owned config,
+      // we add it.
+      return $owned_configs[$name];
+    }
     $data = OwnedConfigHelper::replaceConfig($data, $owned_configs[$name]);
 
     return $data;
@@ -106,7 +111,9 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     foreach (array_keys($owned_config) as $name) {
       if (isset($data[$name])) {
         $data[$name] = $this->filterRead($name, $data[$name]);
+        continue;
       }
+      $data[$name] = $this->filterRead($name, FALSE);
     }
 
     return $data;
@@ -153,6 +160,20 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
   /**
    * {@inheritdoc}
    */
+  public function filterListAll($prefix, array $data) {
+    $owned = $this->getOwnedConfig();
+    foreach (array_keys($owned) as $name) {
+      if (!in_array($name, $data) && ($prefix === "" || strpos($name, $prefix) === 0)) {
+        $data[] = $name;
+      }
+    }
+
+    return $data;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function filterRename($name, $new_name, $rename) {
     if (!$this->isDefaultCollection()) {
       return $rename;
@@ -176,8 +197,13 @@ class ConfigOwner extends ConfigFilterBase implements ContainerFactoryPluginInte
     }
 
     $owned_config = $this->getOwnedConfig();
+    if ($prefix === '' && !empty($owned_config)) {
+      // Don't allow to delete all configuration.
+      return FALSE;
+    }
+
     foreach (array_keys($owned_config) as $name) {
-      if ($prefix !== '' && strpos($name, $prefix) === 0) {
+      if (strpos($name, $prefix) === 0) {
         // If the prefix would delete any of the owned configs, we must not
         // allow this operation.
         return FALSE;

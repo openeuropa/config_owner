@@ -1,0 +1,7 @@
+langcode: en
+status: true
+dependencies: {  }
+id: config_owner_test
+label: 'Config owner test'
+description: 'Test menu for the config owner'
+locked: true

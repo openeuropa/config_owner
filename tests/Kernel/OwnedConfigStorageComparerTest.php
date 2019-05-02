@@ -40,7 +40,7 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
       'config_owner_test.tps_ignore',
       'system.mail',
     ], $changes['update']);
-    $this->assertEquals(['config_owner_test.optional_one'], $changes['create']);
+    $this->assertEmpty($changes['create']);
     $this->assertEmpty($changes['delete']);
     $this->assertEmpty($changes['rename']);
 
@@ -84,8 +84,8 @@ class OwnedConfigStorageComparerTest extends ConfigOwnerTestBase {
 
     // Assert that the sync config (owned) only contains the optional config
     // that was imported (had all dependencies met).
-    $this->assertEmpty($storage_comparer->getSourceStorage()->read('config_owner_test.optional_two'));
-    $this->assertEquals('Optional One', $storage_comparer->getSourceStorage()->read('config_owner_test.optional_one')['name']);
+    $this->assertEmpty($storage_comparer->getSourceStorage()->read('views.view.config_owner_test_view_one'));
+    $this->assertEquals('Config owner test', $storage_comparer->getSourceStorage()->read('system.menu.config_owner_test')['label']);
   }
 
 }
