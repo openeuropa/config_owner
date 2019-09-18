@@ -150,7 +150,7 @@ class OwnedConfigManager extends DefaultPluginManager implements OwnedConfigMana
    * @return array
    *   The flattened config data.
    *
-   * @throws PluginException
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   protected function flattenConfigs(array $configs) {
     $flat = [];
