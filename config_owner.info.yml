@@ -2,6 +2,6 @@ name: Config Owner
 description: Allows the enforcing of config ownership.
 type: module
 core: 8.x
-php: 7.1
+php: 7.2
 dependencies:
   - config_filter:config_filter
