@@ -4,7 +4,7 @@ workspace:
 
 services:
   web:
-    image: fpfis/httpd-php-ci:7.1
+    image: fpfis/httpd-php-ci:${PHP_VERSION}
     environment:
       - DOCUMENT_ROOT=/test/config_owner
   mysql:
@@ -15,7 +15,7 @@ services:
 pipeline:
   composer-install:
     group: prepare
-    image: fpfis/httpd-php-ci:7.1
+    image: fpfis/httpd-php-ci:${PHP_VERSION}
     volumes:
       - /cache:/cache
     commands:
@@ -23,7 +23,7 @@ pipeline:
 
   composer-update-lowest:
     group: prepare-lowest
-    image: fpfis/httpd-php-ci:7.1
+    image: fpfis/httpd-php-ci:${PHP_VERSION}
     volumes:
       - /cache:/cache
     commands:
@@ -33,19 +33,19 @@ pipeline:
         COMPOSER_BOUNDARY: lowest
 
   site-install:
-    image: fpfis/httpd-php-ci:7.1
+    image: fpfis/httpd-php-ci:${PHP_VERSION}
     commands:
       - ./vendor/bin/run drupal:site-install
 
   test-grumphp:
     group: test
-    image: fpfis/httpd-php-ci:7.1
+    image: fpfis/httpd-php-ci:${PHP_VERSION}
     commands:
       - ./vendor/bin/grumphp run
 
   test-phpunit:
     group: test
-    image: fpfis/httpd-php-ci:7.1
+    image: fpfis/httpd-php-ci:${PHP_VERSION}
     commands:
       - ./vendor/bin/phpunit
 
@@ -53,3 +53,6 @@ matrix:
   COMPOSER_BOUNDARY:
     - lowest
     - highest
+  PHP_VERSION:
+    - 7.2
+    - 7.3
